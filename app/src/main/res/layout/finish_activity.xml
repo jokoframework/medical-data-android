@@ -12,7 +12,7 @@
 
         <RelativeLayout
             android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="508dp"
             android:paddingBottom="50dp"
             android:paddingLeft="30dp"
             android:paddingRight="30dp"
@@ -34,13 +34,23 @@
                     android:id="@+id/thanks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textAppearance="?android:attr/textAppearanceLarge"
-                    android:text="@string/thanks"
+                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
+                    android:layout_marginRight="@dimen/activity_horizontal_margin"
+                    android:layout_marginStart="@dimen/activity_horizontal_margin"
                     android:paddingBottom="@dimen/activity_vertical_margin"
                     android:paddingTop="@dimen/activity_vertical_margin"
-                    android:layout_marginStart="@dimen/activity_horizontal_margin"
-                    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-                    android:layout_marginRight="@dimen/activity_horizontal_margin"/>
+                    android:text="@string/thanks"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+                <TextView
+                    android:id="@+id/textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentTop="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="134dp"
+                    android:text="@string/youmaychange"
+                    android:textSize="18sp" />
 
             </RelativeLayout>
 
@@ -49,10 +59,9 @@
                 android:layout_height="wrap_content"
                 android:text="@string/change"
                 android:id="@+id/button_finish"
-                android:layout_below="@+id/thanks_box"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="80dp"
-                android:onClick="btnChange"/>
+                android:onClick="btnChange"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true" />
 
 
         </RelativeLayout>

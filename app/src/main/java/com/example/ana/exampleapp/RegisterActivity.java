@@ -27,6 +27,7 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
+import static android.R.attr.y;
 import static com.mongodb.client.model.Filters.eq;
 
 
@@ -44,7 +45,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register_activity);
-
+        setInitialDateBirth();
         // Allow a part of the terms and conditions text to be clickable.
         TextView tv = (TextView) findViewById(R.id.terms_text);
         String terms1 = getString(R.string.terms1);
@@ -68,6 +69,13 @@ public class RegisterActivity extends AppCompatActivity {
      * @see TextView#setError(CharSequence)
      * @see EditText#setError(CharSequence)
      */
+
+    public void setInitialDateBirth(){
+        DatePicker date_picker = (DatePicker) findViewById(R.id.age_answer);
+        //Values pretended by @author...
+        date_picker.init(1985, 3, 10, null);
+    }
+
     public void btnFinish(View view) {
         String email_text;
         String name_text;

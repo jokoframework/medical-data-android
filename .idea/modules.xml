@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
+      <module fileurl="file://$PROJECT_DIR$/joko-medicaldataandroid.iml" filepath="$PROJECT_DIR$/joko-medicaldataandroid.iml" />
       <module fileurl="file://$PROJECT_DIR$/medical-data-android.iml" filepath="$PROJECT_DIR$/medical-data-android.iml" />
     </modules>
   </component>

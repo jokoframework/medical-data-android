@@ -93,6 +93,7 @@
 
     <!-- finish_activity -->
     <string name="thanks">¡Gracias! Los datos se han enviado correctamente</string>
+    <string name="youmaychange">Puedes cambiar las respuestas más adelante !!</string>
     <string name="change">ACEPTAR</string>
 
     <!-- profile_activity -->

@@ -95,6 +95,7 @@
 
     <!-- finish_activity -->
     <string name="thanks">Thanks! Your answers have been correctly sent</string>
+    <string name="youmaychange">You may change the answers later !!</string>
     <string name="change">ACCEPT</string>
 
     <!-- profile_activity -->

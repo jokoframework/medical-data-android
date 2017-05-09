@@ -1,0 +1,5 @@
+projectKey=bip4cast
+serverUrl=http://localhost:9000
+dashboardUrl=http://localhost:9000/dashboard/index/bip4cast
+ceTaskId=AVvt1qSuMi7_G9x4RzoD
+ceTaskUrl=http://localhost:9000/api/ce/task?id=AVvt1qSuMi7_G9x4RzoD

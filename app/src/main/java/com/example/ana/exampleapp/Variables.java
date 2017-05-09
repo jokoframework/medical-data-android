@@ -17,15 +17,14 @@ import android.view.inputmethod.InputMethodManager;
  */
 public final class Variables {
     // The server IP
-    private static final String IP = "IP";
+    private static final String IP = "192.168.0.21"; // MongoDB server...
+    private String ip = System.getProperty("myapplication.ip"); //solution proposal of sonar-runner...
     private static final String PORT = "27017";
     // MongoDB uri with the IP, authentication (user, password and mechanism), database, etc.
-    public static final String mongo_uri = "mongodb://androidUser:password@" + IP + ":" + PORT +
-            "/bipolarDatabase?authMechanism=MONGODB-CR";
-
+    //public static final String mongo_uri = "mongodb://androidUser:password@" + IP + ":" + PORT +
+            //"/bipolarDatabase?authMechanism=MONGODB-CR";
     //used for test purpose!
-    //public static final String mongo_uri = "mongodb://" + IP + ":" + PORT + "/test";
-
+    public static final String mongo_uri = "mongodb://" + IP + ":" + PORT + "/test";
     // Name of shared preferences file;
     public static final String PREFS_NAME = "MyPrefsFile";
     // Regular expression to check email correction
@@ -35,6 +34,11 @@ public final class Variables {
      * Final class: to prevent someone from accidentally instantiating the class, we give it an
      * empty constructor.
      */
+    public void ipfromsystem(){
+        String ip = System.getProperty("myapplication.ip");
+        Log.i("Ip found", ip);
+    }
+
     public Variables() {
     }
 
