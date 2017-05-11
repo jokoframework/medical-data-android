@@ -42,3 +42,4 @@ Code published under GNU GENERAL PUBLIC LICENSE v3 (see [LICENSE](LICENSE)).
 ## Sonar Analysis
 
 To make a sonar analysis of the code, you need to follow this [guide](https://androidresearch.wordpress.com/2014/05/29/analysing-android-code-with-sonarqube/), to download requested files.
+The sonar-project.properties is already set in the project.
