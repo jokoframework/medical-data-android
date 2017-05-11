@@ -37,6 +37,8 @@ import static com.mongodb.client.model.Filters.eq;
  *
  * @author Ana María Martínez Gómez
  */
+
+
 public class MainActivity extends AppCompatActivity {
     //settings, mDbHelper, readable_db and projection are used repeatedly
     SharedPreferences settings;
