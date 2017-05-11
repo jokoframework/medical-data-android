@@ -38,3 +38,7 @@ The development of this project was started by Ana María Martínez Gómez and y
 ## Licence
 
 Code published under GNU GENERAL PUBLIC LICENSE v3 (see [LICENSE](LICENSE)).
+
+##Sonar Analysis
+
+To make a sonar analysis of the code, you need to follow this [guide](https://androidresearch.wordpress.com/2014/05/29/analysing-android-code-with-sonarqube/), to download requested files.
