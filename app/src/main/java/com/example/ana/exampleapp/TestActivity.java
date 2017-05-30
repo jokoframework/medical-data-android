@@ -218,7 +218,6 @@ public class TestActivity extends AppCompatActivity {
             longitude = gps.getLongitude();
         } else {
             gps.showSettingsAlert();
-
         }
     }
 
