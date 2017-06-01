@@ -1,0 +1,62 @@
+package com.example.ana.exampleapp;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.AsyncTask;
+import android.util.Log;
+
+import com.mongodb.MongoClient;
+import com.mongodb.MongoClientURI;
+import com.mongodb.client.MongoCollection;
+import com.mongodb.client.MongoDatabase;
+import org.bson.Document;
+import org.bson.types.ObjectId;
+
+import java.sql.Timestamp;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import static android.content.ContentValues.TAG;
+
+
+/**
+ * Created by joaqui on 22/05/17.
+ */
+
+//In charge to store location data in "Locations" collections...
+
+public class LocationDataSend extends AsyncTask<Context, Void, Boolean> {
+
+//    String addrs = "mongodb://192.168.0.21:27017/test";
+//    Location location = GpsService.nlocation;
+    @Override
+    protected Boolean doInBackground(Context... contexts) {
+        SharedPreferences settings =
+                contexts[0].getSharedPreferences(Variables.PREFS_NAME, Context.MODE_PRIVATE);
+        try {
+            MongoClientURI mongoClientURI = new MongoClientURI(Variables.MONGO_URI);
+            MongoClient mongoClient = new MongoClient(mongoClientURI);
+            MongoDatabase dbMongo = mongoClient.getDatabase(mongoClientURI.getDatabase());
+            MongoCollection<Document> coll = dbMongo.getCollection("locations");
+            Calendar cal = Calendar.getInstance();
+            DateFormat format_day = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
+            Timestamp now = new Timestamp(cal.getTime().getTime());
+            ObjectId userId = new ObjectId(settings.getString("user_id", ""));
+
+            Document document = new Document()
+                    .append("user_id", userId)
+                    .append("latitud", GpsService.nlocation.getLatitude())
+                    .append("longitud", GpsService.nlocation.getLongitude())
+                    .append("onDate", now.toString());
+
+            coll.insertOne(document);
+
+            mongoClient.close();
+            return true;
+        } catch (Exception e) {
+            Log.e(TAG,String.format("Error en la carga de datos a la MongoDb %s", e.getMessage()),e);
+            return false;
+        }
+    }
+
+}

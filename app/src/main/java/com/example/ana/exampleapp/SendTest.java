@@ -65,7 +65,7 @@ class SendTest extends AsyncTask<Context, Void, Boolean> {
         Log.v(TAG, "Tests: " + String.valueOf(local_tests));
         if (local_tests > 0 && canConnect(context, settings)) {
             try {
-                MongoClientURI mongoClientURI = new MongoClientURI(Variables.mongo_uri);
+                MongoClientURI mongoClientURI = new MongoClientURI(Variables.MONGO_URI);
                 MongoClient mongoClient = new MongoClient(mongoClientURI);
                 MongoDatabase dbMongo = mongoClient.getDatabase(mongoClientURI.getDatabase());
                 MongoCollection<Document> coll = dbMongo.getCollection("mobileTests");

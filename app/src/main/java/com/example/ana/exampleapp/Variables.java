@@ -9,6 +9,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import static android.R.attr.key;
+import static android.R.attr.value;
+import static java.lang.System.setProperty;
+
 
 /**
  * Class with static final variables and methods used around the program.
@@ -16,15 +20,18 @@ import android.view.inputmethod.InputMethodManager;
  * @author Ana María Martínez Gómez
  */
 public final class Variables {
+
     // The server IP
-    private static final String IP = "192.168.0.21"; // MongoDB server...
-    //private String ip = System.getProperty("myapplication.ip"); //solution proposal of sonar-runner...
+
+    private static String a = setProperty("myapplication.ip","192.168.0.21");
+//    private static final String IP = "192.168.0.21"; // MongoDB server...
+    private static String IP = System.getProperty("myapplication.ip"); //solution proposal of sonar-runner...
     private static final String PORT = "27017";
     // MongoDB uri with the IP, authentication (user, password and mechanism), database, etc.
-    //public static final String mongo_uri = "mongodb://androidUser:password@" + IP + ":" + PORT +
+    //public static final String MONGO_URI = "mongodb://androidUser:password@" + IP + ":" + PORT +
             //"/bipolarDatabase?authMechanism=MONGODB-CR";
     //used for test purpose!
-    public static final String mongo_uri = "mongodb://" + IP + ":" + PORT + "/test";
+    public static final String MONGO_URI = "mongodb://" + IP + ":" + PORT + "/test";
     // Name of shared preferences file;
     public static final String PREFS_NAME = "MyPrefsFile";
     // Regular expression to check email correction

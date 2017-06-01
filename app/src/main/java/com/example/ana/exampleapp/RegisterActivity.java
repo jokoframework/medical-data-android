@@ -27,7 +27,6 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import static android.R.attr.y;
 import static com.mongodb.client.model.Filters.eq;
 
 
@@ -259,7 +258,7 @@ public class RegisterActivity extends AppCompatActivity {
         @Override
         protected Integer doInBackground(User... params) {
             try {
-                MongoClientURI mongoClientURI = new MongoClientURI(Variables.mongo_uri);
+                MongoClientURI mongoClientURI = new MongoClientURI(Variables.MONGO_URI);
                 MongoClient mongoClient = new MongoClient(mongoClientURI);
                 MongoDatabase dbMongo = mongoClient.getDatabase(mongoClientURI.getDatabase());
                 MongoCollection<Document> coll = dbMongo.getCollection("users");

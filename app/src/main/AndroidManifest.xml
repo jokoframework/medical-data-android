@@ -27,6 +27,7 @@
         <activity android:name=".ConfigurationActivity"></activity>
         <activity android:name=".InformationActivity"></activity>
         <service android:name=".TestsService"></service>
+        <service android:name=".GpsService"/>
     </application>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
