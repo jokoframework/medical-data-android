@@ -13,14 +13,12 @@ import org.bson.Document;
 import org.bson.types.ObjectId;
 
 import java.sql.Timestamp;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import static android.content.ContentValues.TAG;
 
 
 /**
- * Created by joaqui on 22/05/17.
+ * Created by joaquin on 22/05/17.
  */
 
 //In charge to store location data in "Locations" collections...
@@ -28,7 +26,6 @@ import static android.content.ContentValues.TAG;
 public class LocationDataSend extends AsyncTask<Context, Void, Boolean> {
 
 //    String addrs = "mongodb://192.168.0.21:27017/test";
-//    Location location = GpsService.nlocation;
     @Override
     protected Boolean doInBackground(Context... contexts) {
         SharedPreferences settings =
@@ -39,7 +36,6 @@ public class LocationDataSend extends AsyncTask<Context, Void, Boolean> {
             MongoDatabase dbMongo = mongoClient.getDatabase(mongoClientURI.getDatabase());
             MongoCollection<Document> coll = dbMongo.getCollection("locations");
             Calendar cal = Calendar.getInstance();
-            DateFormat format_day = new SimpleDateFormat("yyyy-MM-dd HH:MM:SS");
             Timestamp now = new Timestamp(cal.getTime().getTime());
             ObjectId userId = new ObjectId(settings.getString("user_id", ""));
 

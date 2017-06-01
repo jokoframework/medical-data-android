@@ -12,7 +12,6 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.annotation.Nullable;
-import android.os.Handler;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
@@ -23,8 +22,6 @@ public class GpsService extends Service implements LocationListener {
 
     public static Location nlocation;
     private LocationManager locationManager;
-    public Handler handler = null;
-    public static Runnable runnable = null;
 
     //mongodb://192.168.0.21:27017/test
     @Override
@@ -34,7 +31,7 @@ public class GpsService extends Service implements LocationListener {
             LocationDataSend runner = new LocationDataSend();
             runner.execute(this);
         } catch (Exception e) {
-            Log.e(TAG,String.format("Error sin ejecucion del servicio %s", e.getMessage()),e);
+            Log.e(TAG,String.format("Error en ejecucion del servicio GpsService %s", e.getMessage()),e);
         }
         stopSelf();
 
@@ -49,9 +46,6 @@ public class GpsService extends Service implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         nlocation = location;
-        Intent i = new Intent("location_update");
-        i.putExtra("coordinates", nlocation.getLatitude() + " " + nlocation.getLongitude());
-        sendBroadcast(i);
     }
 
     @Override
@@ -67,7 +61,6 @@ public class GpsService extends Service implements LocationListener {
     @Override
     public void onProviderDisabled(String s) {
         Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-        i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }
 
