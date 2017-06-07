@@ -178,8 +178,8 @@ class SendTest extends AsyncTask<Context, Void, Boolean> {
                 .append("timeBed", c.getInt(15))
                 .append("timeSleep", c.getInt(16))
                 .append("timeWakeUp", c.getInt(17))
-                .append("latitude", c.getInt(18))
-                .append("longitude", c.getInt(19));
+                .append("latitude", GpsService.getNlocation().getLatitude())
+                .append("longitude",GpsService.getNlocation().getLongitude());
         if (isFemale) {
             document.append("menstruation", c.getInt(10));
         }

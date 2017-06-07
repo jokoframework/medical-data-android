@@ -1,10 +1,8 @@
 package com.example.ana.exampleapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -41,10 +39,9 @@ public class TestActivity extends AppCompatActivity {
     Runnable runGpsService = new Runnable() {
         @Override
         public void run() {
-            Toast.makeText(getApplicationContext(), "Location Saved", Toast.LENGTH_LONG).show();
             Intent i = new Intent(getApplicationContext(), GpsService.class);
             startService(i);
-            handler.postDelayed(this,3600000);
+            handler.postDelayed(this,Variables.timeToGetLocationMilli);
         }
     };
     /*rating stars: no_value = 10. questions 1 and 2 = -3 to 3. questions 3 to 6 = 1 to 5
@@ -191,20 +188,6 @@ public class TestActivity extends AppCompatActivity {
             r6.updateColor();
         }
 
-        allowLocation = settings.getBoolean("Location_enabled", true);
-        if (allowLocation) {
-            // If api > 23 then the user must grant the permission to access the network or location
-            boolean checkVersion = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-            boolean checkAccessFineLocation = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-            boolean checkCoarseLocation = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-            if (checkVersion && checkAccessFineLocation && checkCoarseLocation) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-
-            } else {
-                handleLocation();
-            }
-
-        }
     }
 
 
@@ -215,45 +198,8 @@ public class TestActivity extends AppCompatActivity {
 //    }
 
     public void handlerGpsServiceExecution(){
-        Toast.makeText(this, "GpsService Started!", Toast.LENGTH_LONG).show();
-        handler.postDelayed(runGpsService, 1000);
+        handler.postDelayed(runGpsService, Variables.startGpsLocationServiceMilli);
     }
-
-
-    /**
-     * Method called after the user weither or not he decide to share his location
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == 1) {
-            // User accepted to share his location
-            handleLocation();
-        } else {
-            // The user decided no to accept to share his location.
-            allowLocation = false;
-        }
-    }
-
-    /**
-     * create new object gps and check if it can
-     * retrieve location from network or gps
-     */
-    private void handleLocation() {
-        // Add the location (latitude;longitude) to the db
-        gps = new GPSManager(TestActivity.this);
-        // check if GPS enabled
-        if (gps.canGetLocation()) {
-            latitude = gps.getLatitude();
-            longitude = gps.getLongitude();
-        } else {
-            gps.showSettingsAlert();
-        }
-    }
-
 
     /**
      * Creates a {@link HelpActivity} providing it a question and a help text
@@ -565,6 +511,5 @@ public class TestActivity extends AppCompatActivity {
         }
         return false;
     }
-
 
 }

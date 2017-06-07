@@ -39,11 +39,11 @@ public class LocationDataSend extends AsyncTask<Context, Void, Boolean> {
             Timestamp now = new Timestamp(cal.getTime().getTime());
             ObjectId userId = new ObjectId(settings.getString("user_id", ""));
 
-            Document document = new Document()
-                    .append("user_id", userId)
-                    .append("latitud", GpsService.nlocation.getLatitude())
-                    .append("longitud", GpsService.nlocation.getLongitude())
-                    .append("onDate", now.toString());
+            Document document = new Document();
+            document.append("user_id", userId);
+            document.append("latitud", GpsService.getNlocation().getLatitude());
+            document.append("longitud", GpsService.getNlocation().getLongitude());
+            document.append("onDate", now.toString());
 
             coll.insertOne(document);
 

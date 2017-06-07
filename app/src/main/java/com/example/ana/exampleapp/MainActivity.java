@@ -61,8 +61,6 @@ public class MainActivity extends AppCompatActivity {
         FeedTestDbHelper mDbHelper = new FeedTestDbHelper(this);
         readable_db = mDbHelper.getReadableDatabase();
         setMainView();
-
-
     }
 
     @Override

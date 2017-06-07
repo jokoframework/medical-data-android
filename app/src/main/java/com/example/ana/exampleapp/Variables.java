@@ -13,38 +13,39 @@ import static android.R.attr.key;
 import static android.R.attr.value;
 import static java.lang.System.setProperty;
 
-
 /**
  * Class with static final variables and methods used around the program.
  *
  * @author Ana María Martínez Gómez
  */
+
 public final class Variables {
 
     // The server IP
-
-    private static String a = setProperty("myapplication.ip","192.168.0.21");
-//    private static final String IP = "192.168.0.21"; // MongoDB server...
-    private static String IP = System.getProperty("myapplication.ip"); //solution proposal of sonar-runner...
+//    private static String a = setProperty("myapplication.ip","192.168.0.21");
+    private static final String IP = "192.168.0.21"; // MongoDB server...
+//    private static String IP = System.getProperty("myapplication.ip"); //solution proposal of sonar-runner...
     private static final String PORT = "27017";
+
     // MongoDB uri with the IP, authentication (user, password and mechanism), database, etc.
     //public static final String MONGO_URI = "mongodb://androidUser:password@" + IP + ":" + PORT +
             //"/bipolarDatabase?authMechanism=MONGODB-CR";
     //used for test purpose!
+
     public static final String MONGO_URI = "mongodb://" + IP + ":" + PORT + "/test";
     // Name of shared preferences file;
     public static final String PREFS_NAME = "MyPrefsFile";
     // Regular expression to check email correction
     public static final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
+    // Time in milliseconds to get users locations...
+    public static final long timeToGetLocationMilli = 3600000; // Hourly...
+    public static final long timeToUpdateLocationMilli =  (timeToGetLocationMilli-1000) / 2 ;
+    public static final long startGpsLocationServiceMilli = 1000;
 
     /**
      * Final class: to prevent someone from accidentally instantiating the class, we give it an
      * empty constructor.
      */
-    public void ipfromsystem(){
-        String ip = System.getProperty("myapplication.ip");
-        Log.i("Ip found", ip);
-    }
 
     public Variables() {
     }
@@ -74,6 +75,7 @@ public final class Variables {
      * there is any other kind of connection. So if the returned value is greater or equal to 0
      * there is connection.
      */
+
     public static int connection(Context context) {
         ConnectivityManager cm =
                 (ConnectivityManager) context.getApplicationContext().getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -97,6 +99,7 @@ public final class Variables {
      * @param settings    the context's shared preferences
      * @param local_tests number of local test that haven't been saved
      */
+
     public static void saveLocalTests(String TAG, SharedPreferences settings, int local_tests) {
         SharedPreferences.Editor editor = settings.edit();
         editor.putInt("local_tests", local_tests);
