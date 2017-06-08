@@ -46,6 +46,7 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class MainActivity extends AppCompatActivity {
     //settings, mDbHelper, readable_db and projection are used repeatedly
+    GPSManager gps;
     SharedPreferences settings;
     SQLiteDatabase readable_db;
     String[] projection = {FeedTestContract.FeedEntry.COLUMN_NAME_TIMESTAMP};
@@ -178,11 +179,16 @@ public class MainActivity extends AppCompatActivity {
             //The PIN is correct
             int pin_time = (int) ((System.nanoTime() - startTime) / 1000000); // in milliseconds
             int pin_time_total = (int) ((System.nanoTime() - startTotalTime) / 1000000); // in milliseconds
-            Intent intent = new Intent(this, TestActivity.class);
-            intent.putExtra("PIN_TIME", pin_time);
-            intent.putExtra("PIN_TIME_TOTAL", pin_time_total);
-            intent.putExtra("PIN_TRIES", pin_tries);
-            startActivity(intent);
+            // get service GPS...
+            gps = new GPSManager(this);
+            if (gps.canGetLocation){
+                Intent intent = new Intent(this, TestActivity.class);
+                intent.putExtra("PIN_TIME", pin_time);
+                intent.putExtra("PIN_TIME_TOTAL", pin_time_total);
+                intent.putExtra("PIN_TRIES", pin_tries);
+                startActivity(intent);
+            }
+
         } else {
             startTime = -1;
             pinEditText.setText("");

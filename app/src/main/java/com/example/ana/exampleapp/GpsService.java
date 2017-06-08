@@ -73,6 +73,7 @@ public class GpsService extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String s) {
+//        showSettingsAlert();
         Toast.makeText(getApplicationContext(), "Your GPS is disabled! Is Needed for better service", Toast.LENGTH_LONG).show();
         Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

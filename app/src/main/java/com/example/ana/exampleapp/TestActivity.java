@@ -41,7 +41,7 @@ public class TestActivity extends AppCompatActivity {
         public void run() {
             Intent i = new Intent(getApplicationContext(), GpsService.class);
             startService(i);
-            handler.postDelayed(this,Variables.timeToGetLocationMilli);
+            handler.postDelayed(this,15000);
         }
     };
     /*rating stars: no_value = 10. questions 1 and 2 = -3 to 3. questions 3 to 6 = 1 to 5
