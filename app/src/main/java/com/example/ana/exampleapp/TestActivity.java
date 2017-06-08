@@ -3,7 +3,6 @@ package com.example.ana.exampleapp;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -23,7 +22,6 @@ import android.widget.TimePicker;
 import android.graphics.Rect;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
 
 
 /**
@@ -41,7 +39,7 @@ public class TestActivity extends AppCompatActivity {
         public void run() {
             Intent i = new Intent(getApplicationContext(), GpsService.class);
             startService(i);
-            handler.postDelayed(this,15000);
+            handler.postDelayed(this,Variables.timeToGetLocationMilli);
         }
     };
     /*rating stars: no_value = 10. questions 1 and 2 = -3 to 3. questions 3 to 6 = 1 to 5
@@ -488,6 +486,7 @@ public class TestActivity extends AppCompatActivity {
      *
      * @param id
      */
+    
     private void prepareCaffeineNumberPicker(int id) {
         NumberPicker np = (NumberPicker) findViewById(id);
         np.setMinValue(0);
@@ -511,5 +510,6 @@ public class TestActivity extends AppCompatActivity {
         }
         return false;
     }
+
 
 }

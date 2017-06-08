@@ -62,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         FeedTestDbHelper mDbHelper = new FeedTestDbHelper(this);
         readable_db = mDbHelper.getReadableDatabase();
         setMainView();
+        runtime_permissions();
     }
 
     @Override
@@ -310,7 +311,6 @@ public class MainActivity extends AppCompatActivity {
         return false;
     }
 
-
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
@@ -323,6 +323,5 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
-
 
 }
