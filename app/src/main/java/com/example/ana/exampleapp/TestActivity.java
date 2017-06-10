@@ -1,9 +1,10 @@
 package com.example.ana.exampleapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Build;
@@ -11,7 +12,6 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.ContentValues;
-import android.util.Log;
 import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
@@ -22,6 +22,7 @@ import android.widget.TimePicker;
 import android.graphics.Rect;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 
 /**
@@ -30,9 +31,20 @@ import android.database.sqlite.SQLiteDatabase;
  * @author Ana María Martínez Gómez
  * @author Niels Jacot
  */
+
 public class TestActivity extends AppCompatActivity {
     private String TAG = "TestActivity";
     private SharedPreferences settings;
+    final Handler handler = new Handler();
+    Runnable runGpsService = new Runnable() {
+        @Override
+        public void run() {
+            Toast.makeText(getApplicationContext(), "GPS saved your Location", Toast.LENGTH_LONG).show();
+            Intent i = new Intent(getApplicationContext(), GpsService.class);
+            startService(i);
+            handler.postDelayed(this,Variables.timeToGetLocationMilli);
+        }
+    };
     /*rating stars: no_value = 10. questions 1 and 2 = -3 to 3. questions 3 to 6 = 1 to 5
     radio group: no = 0, si = 1, not_checked = -1 (menstruation 0 by default - men haven't got
                  menstruation)
@@ -62,10 +74,6 @@ public class TestActivity extends AppCompatActivity {
             FeedTestContract.FeedEntry.COLUMN_NAME_Q13,
             FeedTestContract.FeedEntry.COLUMN_NAME_Q14
     };
-    //Variables to handle the location
-    private GPSManager gps;
-    private double latitude, longitude;
-    private boolean allowLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,6 +91,12 @@ public class TestActivity extends AppCompatActivity {
         tp12.setIs24HourView(true);
         tp13.setIs24HourView(true);
         tp14.setIs24HourView(true);
+
+        //The PIN is correct
+        //start saving GPS location data...
+        if(!runtime_permissions()) {
+        handlerGpsServiceExecution();
+        }
 
         prepareCaffeineNumberPicker(R.id.question8_rating);
         prepareNumberPicker(R.id.question9_rating);
@@ -171,56 +185,19 @@ public class TestActivity extends AppCompatActivity {
             r6.updateColor();
         }
 
-        allowLocation = settings.getBoolean("Location_enabled", true);
-        if (allowLocation) {
-            // If api > 23 then the user must grant the permission to access the network or location
-            boolean checkVersion = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-            boolean checkAccessFineLocation = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-            boolean checkCoarseLocation = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-            if (checkVersion && checkAccessFineLocation && checkCoarseLocation) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-
-            } else {
-                handleLocation();
-            }
-
-        }
     }
 
-    /**
-     * Method called after the user weither or not he decide to share his location
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == 1) {
-            // User accepted to share his location
-            handleLocation();
-        } else {
-            // The user decided no to accept to share his location.
-            allowLocation = false;
-        }
-    }
 
-    /**
-     * create new object gps and check if it can
-     * retrieve location from network or gps
-     */
-    private void handleLocation() {
-        // Add the location (latitude;longitude) to the db
-        gps = new GPSManager(TestActivity.this);
-        // check if GPS enabled
-        if (gps.canGetLocation()) {
-            latitude = gps.getLatitude();
-            longitude = gps.getLongitude();
-        } else {
-            gps.showSettingsAlert();
-        }
-    }
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        handler.removeCallbacks(runGpsService);
+//    }
 
+    public void handlerGpsServiceExecution(){
+        Toast.makeText(getApplicationContext(), "GPSService Created", Toast.LENGTH_LONG).show();
+        handler.postDelayed(runGpsService, Variables.startGpsLocationServiceMilli);
+    }
 
     /**
      * Creates a {@link HelpActivity} providing it a question and a help text
@@ -381,16 +358,6 @@ public class TestActivity extends AppCompatActivity {
             values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TRIES, pin_tries);
             for (int i = 0; i < questions.length; i++)
                 values.put(FeedTestContract.QUESTION_COLUMNS_NAMES[i], questions[i]);
-
-            // Add the location (latitude;longitude) to the db
-            if (allowLocation) {
-                values.put(FeedTestContract.FeedEntry.COLUMN_LATITUDE, latitude);
-                values.put(FeedTestContract.FeedEntry.COLUMN_LONGITUDE, longitude);
-                Log.i("GPS: latitude", String.valueOf(latitude));
-                Log.i("GPS: longitude", String.valueOf(longitude));
-            }
-
-
             if (repeating_test) {
                 // If test has already been filled, we delete the last entry from the database
                 String selection =
@@ -509,6 +476,7 @@ public class TestActivity extends AppCompatActivity {
      *
      * @param id
      */
+
     private void prepareCaffeineNumberPicker(int id) {
         NumberPicker np = (NumberPicker) findViewById(id);
         np.setMinValue(0);
@@ -521,6 +489,28 @@ public class TestActivity extends AppCompatActivity {
                 return String.valueOf((i - 1) * 10);
             }
         });
+    }
+
+    private boolean runtime_permissions() {
+        if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},100);
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 100){
+            if( grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                handlerGpsServiceExecution();
+            }else {
+                runtime_permissions();
+            }
+        }
     }
 
 }

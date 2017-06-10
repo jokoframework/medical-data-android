@@ -88,7 +88,7 @@ public final class FeedTestContract {
     }
 
     //To make database management easier in TestActivity
-    public static final String[] QUESTION_COLUMNS_NAMES =
+    protected static final String[] QUESTION_COLUMNS_NAMES =
             new String[]{
                     FeedEntry.COLUMN_NAME_Q1,
                     FeedEntry.COLUMN_NAME_Q2,

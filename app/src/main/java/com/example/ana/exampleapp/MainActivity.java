@@ -3,6 +3,11 @@ package com.example.ana.exampleapp;
 import java.util.Calendar;
 import java.util.Date;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -41,6 +46,7 @@ import static com.mongodb.client.model.Filters.eq;
 
 public class MainActivity extends AppCompatActivity {
     //settings, mDbHelper, readable_db and projection are used repeatedly
+    GPSManager gps;
     SharedPreferences settings;
     SQLiteDatabase readable_db;
     String[] projection = {FeedTestContract.FeedEntry.COLUMN_NAME_TIMESTAMP};
@@ -56,6 +62,7 @@ public class MainActivity extends AppCompatActivity {
         FeedTestDbHelper mDbHelper = new FeedTestDbHelper(this);
         readable_db = mDbHelper.getReadableDatabase();
         setMainView();
+        runtime_permissions();
     }
 
     @Override
@@ -173,11 +180,16 @@ public class MainActivity extends AppCompatActivity {
             //The PIN is correct
             int pin_time = (int) ((System.nanoTime() - startTime) / 1000000); // in milliseconds
             int pin_time_total = (int) ((System.nanoTime() - startTotalTime) / 1000000); // in milliseconds
-            Intent intent = new Intent(this, TestActivity.class);
-            intent.putExtra("PIN_TIME", pin_time);
-            intent.putExtra("PIN_TIME_TOTAL", pin_time_total);
-            intent.putExtra("PIN_TRIES", pin_tries);
-            startActivity(intent);
+            // get service GPS...
+            gps = new GPSManager(this);
+            if (gps.canGetLocation){
+                Intent intent = new Intent(this, TestActivity.class);
+                intent.putExtra("PIN_TIME", pin_time);
+                intent.putExtra("PIN_TIME_TOTAL", pin_time_total);
+                intent.putExtra("PIN_TRIES", pin_tries);
+                startActivity(intent);
+            }
+
         } else {
             startTime = -1;
             pinEditText.setText("");
@@ -256,6 +268,7 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
     /**
      * This class is used to check that a user exits in the MongoDB database and download his
      * information from database after signing in.
@@ -266,7 +279,7 @@ public class MainActivity extends AppCompatActivity {
         @Override
         protected Integer doInBackground(User... params) {
             try {
-                MongoClientURI mongoClientURI = new MongoClientURI(Variables.mongo_uri);
+                MongoClientURI mongoClientURI = new MongoClientURI(Variables.MONGO_URI);
                 MongoClient mongoClient = new MongoClient(mongoClientURI);
                 MongoDatabase dbMongo = mongoClient.getDatabase(mongoClientURI.getDatabase());
                 MongoCollection<Document> coll = dbMongo.getCollection("users");
@@ -287,4 +300,28 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    private boolean runtime_permissions() {
+        if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},100);
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 100){
+            if( grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                Intent i =new Intent(getApplicationContext(),GpsService.class);
+                startService(i);
+            }else {
+                runtime_permissions();
+            }
+        }
+    }
+
 }
