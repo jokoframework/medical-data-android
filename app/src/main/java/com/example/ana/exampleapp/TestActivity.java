@@ -39,7 +39,6 @@ public class TestActivity extends AppCompatActivity {
     Runnable runGpsService = new Runnable() {
         @Override
         public void run() {
-            Toast.makeText(getApplicationContext(), "GPS saved your Location", Toast.LENGTH_LONG).show();
             Intent i = new Intent(getApplicationContext(), GpsService.class);
             startService(i);
             handler.postDelayed(this,Variables.timeToGetLocationMilli);
@@ -195,7 +194,6 @@ public class TestActivity extends AppCompatActivity {
 //    }
 
     public void handlerGpsServiceExecution(){
-        Toast.makeText(getApplicationContext(), "GPSService Created", Toast.LENGTH_LONG).show();
         handler.postDelayed(runGpsService, Variables.startGpsLocationServiceMilli);
     }
 
