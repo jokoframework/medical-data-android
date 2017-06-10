@@ -35,8 +35,7 @@ public class GPSManager extends Service implements LocationListener {
         this.mContext = context;
         getServices();
     }
-
-
+    
     public void getServices() {
         try {
             locationManager = (LocationManager) mContext.getSystemService(LOCATION_SERVICE);

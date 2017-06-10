@@ -3,6 +3,7 @@ package com.example.ana.exampleapp;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -11,7 +12,6 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.ContentValues;
-import android.util.Log;
 import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
@@ -22,6 +22,7 @@ import android.widget.TimePicker;
 import android.graphics.Rect;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.widget.Toast;
 
 
 /**
@@ -30,6 +31,7 @@ import android.database.sqlite.SQLiteDatabase;
  * @author Ana María Martínez Gómez
  * @author Niels Jacot
  */
+
 public class TestActivity extends AppCompatActivity {
     private String TAG = "TestActivity";
     private SharedPreferences settings;
@@ -37,6 +39,7 @@ public class TestActivity extends AppCompatActivity {
     Runnable runGpsService = new Runnable() {
         @Override
         public void run() {
+            Toast.makeText(getApplicationContext(), "GPS saved your Location", Toast.LENGTH_LONG).show();
             Intent i = new Intent(getApplicationContext(), GpsService.class);
             startService(i);
             handler.postDelayed(this,Variables.timeToGetLocationMilli);
@@ -71,10 +74,6 @@ public class TestActivity extends AppCompatActivity {
             FeedTestContract.FeedEntry.COLUMN_NAME_Q13,
             FeedTestContract.FeedEntry.COLUMN_NAME_Q14
     };
-    //Variables to handle the location
-    private GPSManager gps;
-    private double latitude, longitude;
-    private boolean allowLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +95,7 @@ public class TestActivity extends AppCompatActivity {
         //The PIN is correct
         //start saving GPS location data...
         if(!runtime_permissions()) {
-            handlerGpsServiceExecution();
+        handlerGpsServiceExecution();
         }
 
         prepareCaffeineNumberPicker(R.id.question8_rating);
@@ -196,6 +195,7 @@ public class TestActivity extends AppCompatActivity {
 //    }
 
     public void handlerGpsServiceExecution(){
+        Toast.makeText(getApplicationContext(), "GPSService Created", Toast.LENGTH_LONG).show();
         handler.postDelayed(runGpsService, Variables.startGpsLocationServiceMilli);
     }
 
@@ -358,16 +358,6 @@ public class TestActivity extends AppCompatActivity {
             values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TRIES, pin_tries);
             for (int i = 0; i < questions.length; i++)
                 values.put(FeedTestContract.QUESTION_COLUMNS_NAMES[i], questions[i]);
-
-            // Add the location (latitude;longitude) to the db
-            if (allowLocation) {
-                values.put(FeedTestContract.FeedEntry.COLUMN_LATITUDE, latitude);
-                values.put(FeedTestContract.FeedEntry.COLUMN_LONGITUDE, longitude);
-                Log.i("GPS: latitude", String.valueOf(latitude));
-                Log.i("GPS: longitude", String.valueOf(longitude));
-            }
-
-
             if (repeating_test) {
                 // If test has already been filled, we delete the last entry from the database
                 String selection =
@@ -486,7 +476,7 @@ public class TestActivity extends AppCompatActivity {
      *
      * @param id
      */
-    
+
     private void prepareCaffeineNumberPicker(int id) {
         NumberPicker np = (NumberPicker) findViewById(id);
         np.setMinValue(0);
@@ -511,5 +501,16 @@ public class TestActivity extends AppCompatActivity {
         return false;
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 100){
+            if( grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                handlerGpsServiceExecution();
+            }else {
+                runtime_permissions();
+            }
+        }
+    }
 
 }

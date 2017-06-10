@@ -23,9 +23,9 @@ public final class Variables {
 
     // The server IP
 //    private static String a = setProperty("myapplication.ip","192.168.0.21");
-    private static final String IP = "192.168.0.21"; // MongoDB server...
+    private static final String IP = "45.56.99.219"; // MongoDB server...
 //    private static String IP = System.getProperty("myapplication.ip"); //solution proposal of sonar-runner...
-    private static final String PORT = "27017";
+    private static final String PORT = "11480";
 
     // MongoDB uri with the IP, authentication (user, password and mechanism), database, etc.
     //public static final String MONGO_URI = "mongodb://androidUser:password@" + IP + ":" + PORT +
