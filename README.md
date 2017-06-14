@@ -43,3 +43,13 @@ Code published under GNU GENERAL PUBLIC LICENSE v3 (see [LICENSE](LICENSE)).
 
 To make a sonar analysis of the code, you need to follow this [guide](https://androidresearch.wordpress.com/2014/05/29/analysing-android-code-with-sonarqube/), to download requested files.
 The sonar-project.properties is already set in the project.
+
+## Compile Application Through Command Line
+
+In order to compile the application using the command line you first need to assure that you have the neccesary SDK tools to do it. Follow this guide to [Install SDK tools](https://docs.oracle.com/cd/E60665_01/salescs_gs/OSDMA/bizcard-uc-setup002.htm#OSDMA6713). Next you need to download/clone this repository
+```
+git clone https://github.com/jokoframework/medical-data-android.git
+cd medical-data-android
+```
+Instruction on how to compile the application can be found [here](https://developer.android.com/studio/build/building-cmdline.html).
+
