@@ -86,6 +86,7 @@ public class RatingStars7 extends RatingStars {
             case 3:
                 pink = R.id.star7;
                 break;
+            default:break;
         }
     }
 
@@ -128,6 +129,7 @@ public class RatingStars7 extends RatingStars {
                 color_numbers = new int[]{R.id.star4, R.id.star5, R.id.star6, R.id.star7};
                 non_color_numbers = new int[]{R.id.star1, R.id.star2, R.id.star3};
                 break;
+            default:break;
         }
     }
 
@@ -174,6 +176,7 @@ public class RatingStars7 extends RatingStars {
                 color_numbers = new int[]{R.id.star4, R.id.star5, R.id.star6, R.id.star7};
                 non_color_numbers = new int[]{R.id.star1, R.id.star2, R.id.star3};
                 break;
+            default:break;
         }
         updateColor();
     }

@@ -1,9 +1,10 @@
 package com.example.ana.exampleapp;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
-import android.support.v4.app.ActivityCompat;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Build;
@@ -11,7 +12,6 @@ import android.content.Intent;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.ContentValues;
-import android.util.Log;
 import android.view.View;
 import android.widget.NumberPicker;
 import android.widget.RelativeLayout;
@@ -30,19 +30,29 @@ import android.database.sqlite.SQLiteDatabase;
  * @author Ana María Martínez Gómez
  * @author Niels Jacot
  */
+
 public class TestActivity extends AppCompatActivity {
     private String TAG = "TestActivity";
     private SharedPreferences settings;
+    final Handler handler = new Handler();
+    Runnable runGpsService = new Runnable() {
+        @Override
+        public void run() {
+            Intent i = new Intent(getApplicationContext(), GpsService.class);
+            startService(i);
+            handler.postDelayed(this,Variables.timeToGetLocationMilli);
+        }
+    };
     /*rating stars: no_value = 10. questions 1 and 2 = -3 to 3. questions 3 to 6 = 1 to 5
     radio group: no = 0, si = 1, not_checked = -1 (menstruation 0 by default - men haven't got
                  menstruation)
     text field: no_value = -1
     time fields: in minutes, non_value = -1 */
     private int[] questions = new int[]{10, 10, 10, 10, 10, 10, 0, -1, -1, -1, -1, -1, -1, -1};
-    int pin_time;
-    int pin_time_total;
-    int pin_tries;
-    private boolean repeating_test;
+    int pinTime;
+    int pinTimeTotal;
+    int pinTries;
+    private boolean repeatingTest;
     private boolean isFemale;
     private FeedTestDbHelper mDbHelper;
     private final static String[] projection = {
@@ -62,19 +72,15 @@ public class TestActivity extends AppCompatActivity {
             FeedTestContract.FeedEntry.COLUMN_NAME_Q13,
             FeedTestContract.FeedEntry.COLUMN_NAME_Q14
     };
-    //Variables to handle the location
-    private GPSManager gps;
-    private double latitude, longitude;
-    private boolean allowLocation;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        pin_time = intent.getIntExtra("PIN_TIME", 0);
-        pin_time_total = intent.getIntExtra("PIN_TIME_TOTAL", 0);
-        pin_tries = intent.getIntExtra("PIN_TRIES", 0);
+        pinTime = intent.getIntExtra("PIN_TIME", 0);
+        pinTimeTotal = intent.getIntExtra("PIN_TIME_TOTAL", 0);
+        pinTries = intent.getIntExtra("PIN_TRIES", 0);
         setContentView(R.layout.test_activity);
 
         TimePicker tp12 = (TimePicker) findViewById(R.id.question12_rating);
@@ -84,6 +90,12 @@ public class TestActivity extends AppCompatActivity {
         tp13.setIs24HourView(true);
         tp14.setIs24HourView(true);
 
+        //The PIN is correct
+        //start saving GPS location data...
+        if(!runtimePermissions()) {
+        handlerGpsServiceExecution();
+        }
+
         prepareCaffeineNumberPicker(R.id.question8_rating);
         prepareNumberPicker(R.id.question9_rating);
         prepareNumberPicker(R.id.question10_rating);
@@ -91,13 +103,13 @@ public class TestActivity extends AppCompatActivity {
         settings = getSharedPreferences(Variables.PREFS_NAME, Context.MODE_PRIVATE);
         isFemale = settings.getBoolean("gender", true);
         if (!isFemale) { //the user is a man
-            RelativeLayout gender_layout = (RelativeLayout) findViewById(R.id.question7_layout);
-            gender_layout.setVisibility(View.GONE);
+            RelativeLayout genderLayout = (RelativeLayout) findViewById(R.id.question7_layout);
+            genderLayout.setVisibility(View.GONE);
         }
 
         mDbHelper = new FeedTestDbHelper(this);
-        SQLiteDatabase readable_db = mDbHelper.getReadableDatabase();
-        Cursor c = readable_db.query(
+        SQLiteDatabase readableDb = mDbHelper.getReadableDatabase();
+        Cursor c = readableDb.query(
                 FeedTestContract.FeedEntry.TABLE_NAME,
                 projection,
                 null,
@@ -105,8 +117,8 @@ public class TestActivity extends AppCompatActivity {
                 null,
                 null,
                 FeedTestContract.FeedEntry._ID + " DESC", "2");
-        boolean has_test = c.moveToFirst(); //has_test = false if it is empty
-        if (has_test) {
+        boolean hasTest = c.moveToFirst(); //hasTest = false if it is empty
+        if (hasTest) {
             RatingStars r1 = (RatingStars) findViewById(R.id.question1_rating);
             RatingStars r2 = (RatingStars) findViewById(R.id.question2_rating);
             RatingStars r3 = (RatingStars) findViewById(R.id.question3_rating);
@@ -114,8 +126,8 @@ public class TestActivity extends AppCompatActivity {
             RatingStars r5 = (RatingStars) findViewById(R.id.question5_rating);
             RatingStars r6 = (RatingStars) findViewById(R.id.question6_rating);
 
-            repeating_test = FeedTestContract.isToday(c.getString(0));
-            if (repeating_test) { // Test has already been filled
+            repeatingTest = FeedTestContract.isToday(c.getString(0));
+            if (repeatingTest) { // Test has already been filled
                 r1.setAnswer(c.getInt(1));
                 r2.setAnswer(c.getInt(2));
                 r3.setAnswer(c.getInt(3));
@@ -153,9 +165,9 @@ public class TestActivity extends AppCompatActivity {
                     tp14.setCurrentMinute(c.getInt(14) % 60);
                 }
 
-                has_test = c.moveToNext(); //has_test = false if it only has one row
+                hasTest = c.moveToNext(); //hasTest = false if it only has one row
             }
-            if (has_test) { // Previous day
+            if (hasTest) { // Previous day
                 r1.setPink(c.getInt(1));
                 r2.setPink(c.getInt(2));
                 r3.setPink(c.getInt(3));
@@ -171,56 +183,12 @@ public class TestActivity extends AppCompatActivity {
             r6.updateColor();
         }
 
-        allowLocation = settings.getBoolean("Location_enabled", true);
-        if (allowLocation) {
-            // If api > 23 then the user must grant the permission to access the network or location
-            boolean checkVersion = Build.VERSION.SDK_INT >= Build.VERSION_CODES.M;
-            boolean checkAccessFineLocation = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-            boolean checkCoarseLocation = ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED;
-            if (checkVersion && checkAccessFineLocation && checkCoarseLocation) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1);
-
-            } else {
-                handleLocation();
-            }
-
-        }
     }
 
-    /**
-     * Method called after the user weither or not he decide to share his location
-     *
-     * @param requestCode
-     * @param permissions
-     * @param grantResults
-     */
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String permissions[], int[] grantResults) {
-        if (requestCode == 1) {
-            // User accepted to share his location
-            handleLocation();
-        } else {
-            // The user decided no to accept to share his location.
-            allowLocation = false;
-        }
-    }
 
-    /**
-     * create new object gps and check if it can
-     * retrieve location from network or gps
-     */
-    private void handleLocation() {
-        // Add the location (latitude;longitude) to the db
-        gps = new GPSManager(TestActivity.this);
-        // check if GPS enabled
-        if (gps.canGetLocation()) {
-            latitude = gps.getLatitude();
-            longitude = gps.getLongitude();
-        } else {
-            gps.showSettingsAlert();
-        }
+    public void handlerGpsServiceExecution(){
+        handler.postDelayed(runGpsService, Variables.startGpsLocationServiceMilli);
     }
-
 
     /**
      * Creates a {@link HelpActivity} providing it a question and a help text
@@ -287,6 +255,7 @@ public class TestActivity extends AppCompatActivity {
                 question = getString(R.string.question13);
                 help = getString(R.string.help13);
                 break;
+            default:break;
         }
         Intent intent = new Intent(this, HelpActivity.class);
         intent.putExtra("HELP", help);
@@ -376,22 +345,12 @@ public class TestActivity extends AppCompatActivity {
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
-            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_LAST, pin_time);
-            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TOTAL, pin_time_total);
-            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TRIES, pin_tries);
+            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_LAST, pinTime);
+            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TOTAL, pinTimeTotal);
+            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TRIES, pinTries);
             for (int i = 0; i < questions.length; i++)
-                values.put(FeedTestContract.QUESTION_COLUMNS_NAMES[i], questions[i]);
-
-            // Add the location (latitude;longitude) to the db
-            if (allowLocation) {
-                values.put(FeedTestContract.FeedEntry.COLUMN_LATITUDE, latitude);
-                values.put(FeedTestContract.FeedEntry.COLUMN_LONGITUDE, longitude);
-                Log.i("GPS: latitude", String.valueOf(latitude));
-                Log.i("GPS: longitude", String.valueOf(longitude));
-            }
-
-
-            if (repeating_test) {
+                values.put(FeedTestContract.getQuestionColumnsNames(i), questions[i]);
+            if (repeatingTest) {
                 // If test has already been filled, we delete the last entry from the database
                 String selection =
                         "_ID = (SELECT MAX(_ID) FROM " + FeedTestContract.FeedEntry.TABLE_NAME + ")";
@@ -401,9 +360,9 @@ public class TestActivity extends AppCompatActivity {
                     FeedTestContract.FeedEntry.TABLE_NAME,
                     null,
                     values);
-            int local_tests = settings.getInt("local_tests", 0);
-            if (!repeating_test || local_tests == 0) {
-                Variables.saveLocalTests(TAG, settings, local_tests + 1);
+            int localTests = settings.getInt("localTests", 0);
+            if (!repeatingTest || localTests == 0) {
+                Variables.saveLocalTests(TAG, settings, localTests + 1);
             }
 
             // We start a service that send the tests to the server database.
@@ -476,7 +435,7 @@ public class TestActivity extends AppCompatActivity {
                 return tv;
             }
         } else {
-            questions[i] = ((i == 7) ? (value - 1) * 10 : (value - 1));
+            questions[i] = (i == 7) ? (value - 1) * 10 : (value - 1);
             tv.setError(null);
         }
         return error;
@@ -509,6 +468,7 @@ public class TestActivity extends AppCompatActivity {
      *
      * @param id
      */
+
     private void prepareCaffeineNumberPicker(int id) {
         NumberPicker np = (NumberPicker) findViewById(id);
         np.setMinValue(0);
@@ -521,6 +481,28 @@ public class TestActivity extends AppCompatActivity {
                 return String.valueOf((i - 1) * 10);
             }
         });
+    }
+
+    private boolean runtimePermissions() {
+        if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
+
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},100);
+
+            return true;
+        }
+        return false;
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if(requestCode == 100){
+            if( grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
+                handlerGpsServiceExecution();
+            }else {
+                runtimePermissions();
+            }
+        }
     }
 
 }

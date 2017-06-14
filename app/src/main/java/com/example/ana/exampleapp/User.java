@@ -173,6 +173,8 @@ public class User {
      * Save the user's information in the shared preferences. I is used after having signed up or
      * signed in.
      */
+
+    // Issue #4 eliminate email from SharedPreferences...
     public void save(Activity activity) {
         SharedPreferences settings = activity.getSharedPreferences(Variables.PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();

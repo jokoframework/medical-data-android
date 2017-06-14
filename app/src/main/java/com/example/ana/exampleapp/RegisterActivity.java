@@ -8,6 +8,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Build;
 import android.content.Intent;
+import android.util.Log;
 import android.view.View;
 import android.widget.DatePicker;
 import android.widget.RelativeLayout;
@@ -27,7 +28,6 @@ import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
-import static android.R.attr.y;
 import static com.mongodb.client.model.Filters.eq;
 
 
@@ -64,7 +64,6 @@ public class RegisterActivity extends AppCompatActivity {
      * first one with error. It also checks that there is internet connection before trying to
      * connect with the database.
      *
-     * @param view the clicked {@link View}.
      * @see #finish()
      * @see TextView#setError(CharSequence)
      * @see EditText#setError(CharSequence)
@@ -89,7 +88,7 @@ public class RegisterActivity extends AppCompatActivity {
         // check name correction
         EditText name = (EditText) findViewById(R.id.name_answer);
         name_text = name.getText().toString();
-        if (name_text.equals("")) {
+        if ("".equals(name_text)) {
             name.setError(getString(R.string.name_blank));
             focusFirstError(name, R.id.name);
             error = true;
@@ -98,7 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
         // check email correction
         EditText email = (EditText) findViewById(R.id.email_answer);
         email_text = email.getText().toString();
-        if (email_text.equals("")) {
+        if ("".equals(email_text)) {
             email.setError(getString(R.string.email_blank));
             if (!error) {
                 focusFirstError(email, R.id.email);
@@ -147,8 +146,7 @@ public class RegisterActivity extends AppCompatActivity {
         }
 
         // ¿Everything correct?
-        if (!error) {
-            if (Variables.connection(this) < 0)
+            if (Variables.connection(this) < 0 && !error)
                 Toast.makeText(this, R.string.no_internet, Toast.LENGTH_LONG).show();
             else {
                 DatePicker birthDate = (DatePicker) findViewById(R.id.age_answer);
@@ -176,14 +174,14 @@ public class RegisterActivity extends AppCompatActivity {
                     } else if (option == 1) {
                         Toast.makeText(this, R.string.repeated_email, Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(this, R.string.register_error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), R.string.mongodb_error, Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
+                    Log.e("Registrer not complited",String.format("The register couldn't be completed. Check that you have internet connexion and try it again later.%s",e.getMessage()),e);
                     Toast.makeText(this, R.string.register_error, Toast.LENGTH_LONG).show();
                 }
                 Variables.hideKeyboard(this);
             }
-        }
     }
 
     /**
@@ -258,8 +256,9 @@ public class RegisterActivity extends AppCompatActivity {
     private class SendRegistration extends AsyncTask<User, Void, Integer> {
         @Override
         protected Integer doInBackground(User... params) {
+
             try {
-                MongoClientURI mongoClientURI = new MongoClientURI(Variables.mongo_uri);
+                MongoClientURI mongoClientURI = new MongoClientURI(Variables.MONGO_URI);
                 MongoClient mongoClient = new MongoClient(mongoClientURI);
                 MongoDatabase dbMongo = mongoClient.getDatabase(mongoClientURI.getDatabase());
                 MongoCollection<Document> coll = dbMongo.getCollection("users");
@@ -274,6 +273,7 @@ public class RegisterActivity extends AppCompatActivity {
                 mongoClient.close();
                 return 0; //Successfully saved
             } catch (Exception e) {
+                Log.e("SendRegistration",String.format("Error en el registro %s", e.getMessage()),e);
                 return 2; // Error
             }
         }

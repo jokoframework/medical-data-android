@@ -18,7 +18,8 @@ public final class FeedTestContract {
      * Final class: to prevent someone from accidentally instantiating the class, we give it an
      * empty constructor.
      */
-    public FeedTestContract() {
+    private FeedTestContract() {
+        //to prevent someone from accidentally instantiating the class
     }
 
     /**
@@ -53,7 +54,7 @@ public final class FeedTestContract {
     public static Long dateWithTimezone(String timestamp) {
         int gmtOffset = TimeZone.getDefault().getRawOffset();
         int gmtDaylightSavings = TimeZone.getDefault().getDSTSavings();
-        return (Timestamp.valueOf(timestamp).getTime() + gmtOffset + gmtDaylightSavings);
+        return Timestamp.valueOf(timestamp).getTime() + gmtOffset + gmtDaylightSavings;
     }
 
     /**
@@ -62,6 +63,10 @@ public final class FeedTestContract {
      * adaptors will expect it to have.
      */
     public static abstract class FeedEntry implements BaseColumns {
+        private FeedEntry(){
+            //to prevent someone from accidentally instantiating the class
+        }
+
         public static final String TABLE_NAME = "test";
         public static final String COLUMN_NAME_PIN_LAST = "speedReactionLast"; // Integer (milliseconds)
         public static final String COLUMN_NAME_PIN_TOTAL = "speedReactionTotal"; // Integer (milliseconds)
@@ -87,8 +92,12 @@ public final class FeedTestContract {
 
     }
 
+    public static String getQuestionColumnsNames(int i) {
+        return QUESTION_COLUMNS_NAMES[i];
+    }
+
     //To make database management easier in TestActivity
-    public static final String[] QUESTION_COLUMNS_NAMES =
+    private static final String[] QUESTION_COLUMNS_NAMES =
             new String[]{
                     FeedEntry.COLUMN_NAME_Q1,
                     FeedEntry.COLUMN_NAME_Q2,

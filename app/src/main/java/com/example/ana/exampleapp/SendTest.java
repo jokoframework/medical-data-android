@@ -65,7 +65,7 @@ class SendTest extends AsyncTask<Context, Void, Boolean> {
         Log.v(TAG, "Tests: " + String.valueOf(local_tests));
         if (local_tests > 0 && canConnect(context, settings)) {
             try {
-                MongoClientURI mongoClientURI = new MongoClientURI(Variables.mongo_uri);
+                MongoClientURI mongoClientURI = new MongoClientURI(Variables.MONGO_URI);
                 MongoClient mongoClient = new MongoClient(mongoClientURI);
                 MongoDatabase dbMongo = mongoClient.getDatabase(mongoClientURI.getDatabase());
                 MongoCollection<Document> coll = dbMongo.getCollection("mobileTests");
@@ -92,27 +92,32 @@ class SendTest extends AsyncTask<Context, Void, Boolean> {
 
                     Document document = getDoc(c, user_id, isFemale, original_date);
                     MongoCursor<Document> it = coll.find(and(and(lt("date", tomorrow_date), gte("date", today_date)), eq("user_id", user_id))).limit(1).iterator();
-                    if (it.hasNext()) {
-                        // replace the entire document except for the _id field
-                        coll.replaceOne(new Document("_id", it.next().getObjectId("_id")), document);
-                    } else {
-                        coll.insertOne(document);
-                    }
+                    replaceOrInsert(it,coll,document);
                     c.moveToPrevious();
                 }
 
                 mongoClient.close();
                 deleteSQLEntries(context);
             } catch (Exception e) {
+                Log.e(TAG,String.format("Error al enviar el Test %s", e.getMessage()),e);
                 Log.v(TAG, e.toString());
             }
             Variables.saveLocalTests(TAG, settings, local_tests);
         }
 
-        boolean start = (local_tests > 0);
+        boolean start = local_tests > 0;
         Log.v(TAG, "Flag: " + (start ? "enabled" : "disabled") +
                 ", Tests: " + String.valueOf(local_tests));
         return start;
+    }
+
+    protected void replaceOrInsert (MongoCursor<Document> it,MongoCollection<Document> coll,Document document){
+        if (it.hasNext()) {
+            // replace the entire document except for the _id field
+            coll.replaceOne(new Document("_id", it.next().getObjectId("_id")), document);
+        } else {
+            coll.insertOne(document);
+        }
     }
 
     /**
@@ -157,7 +162,7 @@ class SendTest extends AsyncTask<Context, Void, Boolean> {
     }
 
     private Document getDoc(Cursor c, ObjectId user_id, Boolean isFemale, Date date) throws java.text.ParseException {
-        boolean drugs = (c.getInt(14) == 1);
+        boolean drugs = c.getInt(14) == 1;
         Document document = new Document()
                 .append("user_id", user_id) // Check pinters
                 .append("date", date) // Convert to date
@@ -178,8 +183,8 @@ class SendTest extends AsyncTask<Context, Void, Boolean> {
                 .append("timeBed", c.getInt(15))
                 .append("timeSleep", c.getInt(16))
                 .append("timeWakeUp", c.getInt(17))
-                .append("latitude", c.getInt(18))
-                .append("longitude", c.getInt(19));
+                .append("latitude", GpsService.getNlocation().getLatitude())
+                .append("longitude",GpsService.getNlocation().getLongitude());
         if (isFemale) {
             document.append("menstruation", c.getInt(10));
         }

@@ -23,7 +23,7 @@ import android.os.Handler;
  */
 public class TestsService extends Service {
 
-    private static BroadcastReceiver networkChangeReceiver; // To be aware of connection changes
+    private BroadcastReceiver networkChangeReceiver; // To be aware of connection changes
     private Handler handler; // Handler for the separate Thread
     private static String TAG = "TestsService";
 
@@ -57,6 +57,7 @@ public class TestsService extends Service {
                 stopSelf();
             }
         } catch (Exception e) {
+            Log.e(TAG,String.format("Error en ejecucion del servicio SendTest %s", e.getMessage()),e);
         }
     }
 
@@ -79,7 +80,7 @@ public class TestsService extends Service {
      */
     private void registerNetworkChangeReceiver() {
         networkChangeReceiver = new BroadcastReceiver() {
-            private String TAG = "registerNetworkChangeReceiver";
+            private String TAG = "NetworkChangeReceiver";
 
             @Override
             public void onReceive(Context context, Intent intent) {
@@ -91,6 +92,7 @@ public class TestsService extends Service {
                         stopSelf();
                     }
                 } catch (Exception e) {
+                    Log.e(TAG,String.format("Error en ejecucion del servicio SendTest %s", e.getMessage()),e);
                 }
             }
         };
