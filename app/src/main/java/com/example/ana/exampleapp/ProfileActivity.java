@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextPaint;
 import android.text.style.ClickableSpan;
+import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.DatePicker;
@@ -85,7 +86,7 @@ public class ProfileActivity extends AppCompatActivity {
         // check name correction
         EditText name = (EditText) findViewById(R.id.name_answer);
         String name_text = name.getText().toString();
-        if (name_text.equals("")) {
+        if ("".equals(name_text)) {
             name.setError(getString(R.string.name_blank));
             focusFirstError(name, R.id.name);
             error = true;
@@ -94,7 +95,7 @@ public class ProfileActivity extends AppCompatActivity {
         // check email correction
         EditText email = (EditText) findViewById(R.id.email_answer);
         String email_text = email.getText().toString();
-        if (email_text.equals("")) {
+        if ("".equals(email_text)) {
             email.setError(getString(R.string.email_blank));
             if (!error) {
                 focusFirstError(email, R.id.email);
@@ -154,6 +155,7 @@ public class ProfileActivity extends AppCompatActivity {
                     Toast.makeText(this, R.string.update_error, Toast.LENGTH_LONG).show();
                 }
             } catch (Exception e) {
+                Log.e("Update Error",String.format("The changes couldn't be saved. Check that you have internet connexion and try it again later.%s", e.getMessage()),e);
                 Toast.makeText(this, R.string.update_error, Toast.LENGTH_LONG).show();
             }
 
@@ -231,6 +233,7 @@ public class ProfileActivity extends AppCompatActivity {
      *
      * @author Ana María Martínez Gómez
      */
+
     private class UpdateRegistration extends AsyncTask<User, Void, Integer> {
         @Override
         protected Integer doInBackground(User... params) {
@@ -254,6 +257,7 @@ public class ProfileActivity extends AppCompatActivity {
                 mongoClient.close();
                 return 0; //Successfully saved
             } catch (Exception e) {
+                Log.e("Updatet Error",String.format("Error al actualizar registro %s", e.getMessage()),e);
                 return 2; // Error
             }
         }

@@ -23,7 +23,7 @@ import static android.content.ContentValues.TAG;
  */
 
  // For stablish GPS service if is not enable...
-public class GPSManager extends Service implements LocationListener {
+public class GPSManager extends Service{
 
     private final Context mContext;
     boolean isGPSEnabled = false;
@@ -91,22 +91,6 @@ public class GPSManager extends Service implements LocationListener {
 
         // Showing Alert Message
         alertDialog.show();
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
     }
 
     @Override

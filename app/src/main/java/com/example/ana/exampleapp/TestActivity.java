@@ -22,7 +22,6 @@ import android.widget.TimePicker;
 import android.graphics.Rect;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
-import android.widget.Toast;
 
 
 /**
@@ -50,10 +49,10 @@ public class TestActivity extends AppCompatActivity {
     text field: no_value = -1
     time fields: in minutes, non_value = -1 */
     private int[] questions = new int[]{10, 10, 10, 10, 10, 10, 0, -1, -1, -1, -1, -1, -1, -1};
-    int pin_time;
-    int pin_time_total;
-    int pin_tries;
-    private boolean repeating_test;
+    int pinTime;
+    int pinTimeTotal;
+    int pinTries;
+    private boolean repeatingTest;
     private boolean isFemale;
     private FeedTestDbHelper mDbHelper;
     private final static String[] projection = {
@@ -79,9 +78,9 @@ public class TestActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         Intent intent = getIntent();
-        pin_time = intent.getIntExtra("PIN_TIME", 0);
-        pin_time_total = intent.getIntExtra("PIN_TIME_TOTAL", 0);
-        pin_tries = intent.getIntExtra("PIN_TRIES", 0);
+        pinTime = intent.getIntExtra("PIN_TIME", 0);
+        pinTimeTotal = intent.getIntExtra("PIN_TIME_TOTAL", 0);
+        pinTries = intent.getIntExtra("PIN_TRIES", 0);
         setContentView(R.layout.test_activity);
 
         TimePicker tp12 = (TimePicker) findViewById(R.id.question12_rating);
@@ -93,7 +92,7 @@ public class TestActivity extends AppCompatActivity {
 
         //The PIN is correct
         //start saving GPS location data...
-        if(!runtime_permissions()) {
+        if(!runtimePermissions()) {
         handlerGpsServiceExecution();
         }
 
@@ -104,13 +103,13 @@ public class TestActivity extends AppCompatActivity {
         settings = getSharedPreferences(Variables.PREFS_NAME, Context.MODE_PRIVATE);
         isFemale = settings.getBoolean("gender", true);
         if (!isFemale) { //the user is a man
-            RelativeLayout gender_layout = (RelativeLayout) findViewById(R.id.question7_layout);
-            gender_layout.setVisibility(View.GONE);
+            RelativeLayout genderLayout = (RelativeLayout) findViewById(R.id.question7_layout);
+            genderLayout.setVisibility(View.GONE);
         }
 
         mDbHelper = new FeedTestDbHelper(this);
-        SQLiteDatabase readable_db = mDbHelper.getReadableDatabase();
-        Cursor c = readable_db.query(
+        SQLiteDatabase readableDb = mDbHelper.getReadableDatabase();
+        Cursor c = readableDb.query(
                 FeedTestContract.FeedEntry.TABLE_NAME,
                 projection,
                 null,
@@ -118,8 +117,8 @@ public class TestActivity extends AppCompatActivity {
                 null,
                 null,
                 FeedTestContract.FeedEntry._ID + " DESC", "2");
-        boolean has_test = c.moveToFirst(); //has_test = false if it is empty
-        if (has_test) {
+        boolean hasTest = c.moveToFirst(); //hasTest = false if it is empty
+        if (hasTest) {
             RatingStars r1 = (RatingStars) findViewById(R.id.question1_rating);
             RatingStars r2 = (RatingStars) findViewById(R.id.question2_rating);
             RatingStars r3 = (RatingStars) findViewById(R.id.question3_rating);
@@ -127,8 +126,8 @@ public class TestActivity extends AppCompatActivity {
             RatingStars r5 = (RatingStars) findViewById(R.id.question5_rating);
             RatingStars r6 = (RatingStars) findViewById(R.id.question6_rating);
 
-            repeating_test = FeedTestContract.isToday(c.getString(0));
-            if (repeating_test) { // Test has already been filled
+            repeatingTest = FeedTestContract.isToday(c.getString(0));
+            if (repeatingTest) { // Test has already been filled
                 r1.setAnswer(c.getInt(1));
                 r2.setAnswer(c.getInt(2));
                 r3.setAnswer(c.getInt(3));
@@ -166,9 +165,9 @@ public class TestActivity extends AppCompatActivity {
                     tp14.setCurrentMinute(c.getInt(14) % 60);
                 }
 
-                has_test = c.moveToNext(); //has_test = false if it only has one row
+                hasTest = c.moveToNext(); //hasTest = false if it only has one row
             }
-            if (has_test) { // Previous day
+            if (hasTest) { // Previous day
                 r1.setPink(c.getInt(1));
                 r2.setPink(c.getInt(2));
                 r3.setPink(c.getInt(3));
@@ -186,12 +185,6 @@ public class TestActivity extends AppCompatActivity {
 
     }
 
-
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        handler.removeCallbacks(runGpsService);
-//    }
 
     public void handlerGpsServiceExecution(){
         handler.postDelayed(runGpsService, Variables.startGpsLocationServiceMilli);
@@ -262,6 +255,7 @@ public class TestActivity extends AppCompatActivity {
                 question = getString(R.string.question13);
                 help = getString(R.string.help13);
                 break;
+            default:break;
         }
         Intent intent = new Intent(this, HelpActivity.class);
         intent.putExtra("HELP", help);
@@ -351,12 +345,12 @@ public class TestActivity extends AppCompatActivity {
             SQLiteDatabase db = mDbHelper.getWritableDatabase();
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
-            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_LAST, pin_time);
-            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TOTAL, pin_time_total);
-            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TRIES, pin_tries);
+            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_LAST, pinTime);
+            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TOTAL, pinTimeTotal);
+            values.put(FeedTestContract.FeedEntry.COLUMN_NAME_PIN_TRIES, pinTries);
             for (int i = 0; i < questions.length; i++)
-                values.put(FeedTestContract.QUESTION_COLUMNS_NAMES[i], questions[i]);
-            if (repeating_test) {
+                values.put(FeedTestContract.getQuestionColumnsNames(i), questions[i]);
+            if (repeatingTest) {
                 // If test has already been filled, we delete the last entry from the database
                 String selection =
                         "_ID = (SELECT MAX(_ID) FROM " + FeedTestContract.FeedEntry.TABLE_NAME + ")";
@@ -366,9 +360,9 @@ public class TestActivity extends AppCompatActivity {
                     FeedTestContract.FeedEntry.TABLE_NAME,
                     null,
                     values);
-            int local_tests = settings.getInt("local_tests", 0);
-            if (!repeating_test || local_tests == 0) {
-                Variables.saveLocalTests(TAG, settings, local_tests + 1);
+            int localTests = settings.getInt("localTests", 0);
+            if (!repeatingTest || localTests == 0) {
+                Variables.saveLocalTests(TAG, settings, localTests + 1);
             }
 
             // We start a service that send the tests to the server database.
@@ -441,7 +435,7 @@ public class TestActivity extends AppCompatActivity {
                 return tv;
             }
         } else {
-            questions[i] = ((i == 7) ? (value - 1) * 10 : (value - 1));
+            questions[i] = (i == 7) ? (value - 1) * 10 : (value - 1);
             tv.setError(null);
         }
         return error;
@@ -489,7 +483,7 @@ public class TestActivity extends AppCompatActivity {
         });
     }
 
-    private boolean runtime_permissions() {
+    private boolean runtimePermissions() {
         if(Build.VERSION.SDK_INT >= 23 && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED){
 
             requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION},100);
@@ -506,7 +500,7 @@ public class TestActivity extends AppCompatActivity {
             if( grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED){
                 handlerGpsServiceExecution();
             }else {
-                runtime_permissions();
+                runtimePermissions();
             }
         }
     }

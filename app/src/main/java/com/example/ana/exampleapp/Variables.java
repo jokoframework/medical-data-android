@@ -9,6 +9,12 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
+import com.mongodb.MongoCredential;
+import com.mongodb.ServerAddress;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import static android.R.attr.key;
 import static android.R.attr.value;
 import static java.lang.System.setProperty;
@@ -22,24 +28,20 @@ import static java.lang.System.setProperty;
 public final class Variables {
 
     // The server IP
-//    private static String a = setProperty("myapplication.ip","192.168.0.21");
     private static final String IP = "45.56.99.219"; // MongoDB server...
-//    private static String IP = System.getProperty("myapplication.ip"); //solution proposal of sonar-runner...
     private static final String PORT = "11480";
 
     // MongoDB uri with the IP, authentication (user, password and mechanism), database, etc.
-    //public static final String MONGO_URI = "mongodb://androidUser:password@" + IP + ":" + PORT +
-            //"/bipolarDatabase?authMechanism=MONGODB-CR";
+    public static final String MONGO_URI = "mongodb://tester:Bip4Cast@" + IP + ":" + PORT +
+    "/test?authMechanism=MONGODB-CR";
     //used for test purpose!
-
-    public static final String MONGO_URI = "mongodb://" + IP + ":" + PORT + "/test";
-    // Name of shared preferences file;
+    // Name of shared preferences file
     public static final String PREFS_NAME = "MyPrefsFile";
     // Regular expression to check email correction
     public static final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     // Time in milliseconds to get users locations...
-    public static final long timeToGetLocationMilli = 3600000; // Hourly...
-    public static final long timeToUpdateLocationMilli =  (timeToGetLocationMilli-1000) / 2 ;
+    public static final long timeToGetLocationMilli = (long) (1000 * 60 * 1);
+    public static final long timeToUpdateLocationMilli =  (timeToGetLocationMilli-(long) 1000) / 2 ;
     public static final long startGpsLocationServiceMilli = 1000;
 
     /**
@@ -47,7 +49,8 @@ public final class Variables {
      * empty constructor.
      */
 
-    public Variables() {
+    private Variables() {
+        // used to prevent someone from accidentally instantiating the class
     }
 
     /**

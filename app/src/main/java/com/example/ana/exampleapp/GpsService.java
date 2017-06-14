@@ -1,10 +1,8 @@
 package com.example.ana.exampleapp;
 
 import android.Manifest;
-import android.app.AlertDialog;
 import android.app.Service;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -27,7 +25,6 @@ public class GpsService extends Service implements LocationListener {
     private static Location nlocation;
     private LocationManager locationManager;
 
-    //mongodb://192.168.0.21:27017/test
     @Override
     public void onCreate() {
         gpsManager();
@@ -63,17 +60,16 @@ public class GpsService extends Service implements LocationListener {
 
     @Override
     public void onStatusChanged(String s, int i, Bundle bundle) {
-
+        // Not needed in application structure
     }
 
     @Override
     public void onProviderEnabled(String s) {
-
+        // Not needed in application structure
     }
 
     @Override
     public void onProviderDisabled(String s) {
-//        showSettingsAlert();
         Toast.makeText(getApplicationContext(), "Your GPS is disabled! Is Needed for better service", Toast.LENGTH_LONG).show();
         Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

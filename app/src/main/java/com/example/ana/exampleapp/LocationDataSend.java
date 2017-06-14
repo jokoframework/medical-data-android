@@ -25,7 +25,6 @@ import static android.content.ContentValues.TAG;
 
 public class LocationDataSend extends AsyncTask<Context, Void, Boolean> {
 
-//    String addrs = "mongodb://192.168.0.21:27017/test";
     @Override
     protected Boolean doInBackground(Context... contexts) {
         SharedPreferences settings =
