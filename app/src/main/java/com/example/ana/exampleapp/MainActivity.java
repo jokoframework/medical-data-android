@@ -241,7 +241,7 @@ public class MainActivity extends AppCompatActivity {
                     } else if (option == 1) {
                         Toast.makeText(this, R.string.wrong_data, Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(this, R.string.register_error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), R.string.mongodb_error, Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
                     Log.e("Error en registro",String.format("The register couldn't be completed. Check that you have internet connexion and try it again later%s", e.getMessage()),e);
