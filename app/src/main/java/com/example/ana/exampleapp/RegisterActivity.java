@@ -63,7 +63,6 @@ public class RegisterActivity extends AppCompatActivity {
      * first one with error. It also checks that there is internet connection before trying to
      * connect with the database.
      *
-     * @param view the clicked {@link View}.
      * @see #finish()
      * @see TextView#setError(CharSequence)
      * @see EditText#setError(CharSequence)
@@ -175,7 +174,7 @@ public class RegisterActivity extends AppCompatActivity {
                     } else if (option == 1) {
                         Toast.makeText(this, R.string.repeated_email, Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(this, R.string.register_error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), R.string.mongodb_error, Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
                     Toast.makeText(this, R.string.register_error, Toast.LENGTH_LONG).show();
@@ -257,6 +256,7 @@ public class RegisterActivity extends AppCompatActivity {
     private class SendRegistration extends AsyncTask<User, Void, Integer> {
         @Override
         protected Integer doInBackground(User... params) {
+
             try {
                 MongoClientURI mongoClientURI = new MongoClientURI(Variables.MONGO_URI);
                 MongoClient mongoClient = new MongoClient(mongoClientURI);

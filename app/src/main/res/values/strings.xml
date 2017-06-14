@@ -46,6 +46,7 @@
     <string name="repeated_email2">There is already a user with the email you introduced. </string>
     <string name="wrong_data">The email or the pin is not correct.</string>
     <string name="update_error">The changes couldn\'t be saved. Check that you have internet connexion and try it again later.</string>
+    <string name="mongodb_error">The server can\'t be reach</string>
 
     <!-- finish_register_activity -->
     <string name="thanks_register">Thanks! The register has been correctly completed</string>

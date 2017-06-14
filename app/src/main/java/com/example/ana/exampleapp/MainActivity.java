@@ -16,6 +16,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -244,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
                     } else if (option == 1) {
                         Toast.makeText(this, R.string.wrong_data, Toast.LENGTH_LONG).show();
                     } else {
-                        Toast.makeText(this, R.string.register_error, Toast.LENGTH_LONG).show();
+                        Toast.makeText(getApplicationContext(), R.string.mongodb_error, Toast.LENGTH_LONG).show();
                     }
                 } catch (Exception e) {
                     Toast.makeText(this, R.string.register_error, Toast.LENGTH_LONG).show();
