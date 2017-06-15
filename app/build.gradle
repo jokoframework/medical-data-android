@@ -26,3 +26,4 @@ dependencies {
     compile 'org.mongodb:mongodb-driver:3.2.2'
     compile 'org.mongodb:bson:3.2.2'
 }
+apply plugin: 'org.owasp.dependencycheck'
