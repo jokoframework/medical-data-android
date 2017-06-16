@@ -179,7 +179,6 @@ public class User {
         SharedPreferences settings = activity.getSharedPreferences(Variables.PREFS_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = settings.edit();
         editor.putString("name", name_text);
-        editor.putString("email", email_text);
         editor.putInt("birthDay", birth_day);
         editor.putInt("birthMonth", birth_month);
         editor.putInt("birthYear", birth_year);
