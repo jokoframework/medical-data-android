@@ -174,6 +174,7 @@ public class User {
      * signed in.
      */
 
+    
     // Issue #4 eliminate email from SharedPreferences...
     public void save(Activity activity) {
         SharedPreferences settings = activity.getSharedPreferences(Variables.PREFS_NAME, Context.MODE_PRIVATE);
