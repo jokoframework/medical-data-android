@@ -27,13 +27,14 @@ public class GpsService extends Service implements LocationListener {
 
     @Override
     public void onCreate() {
-        gpsManager();
+        gpsLocationManager();
         try {
             LocationDataSend runner = new LocationDataSend();
             runner.execute(this);
         } catch (Exception e) {
             Log.e(TAG,String.format("Error en ejecucion del servicio GpsService %s", e.getMessage()),e);
         }
+        locationManager.removeUpdates(this);
         stopSelf();
     }
 
@@ -70,13 +71,12 @@ public class GpsService extends Service implements LocationListener {
 
     @Override
     public void onProviderDisabled(String s) {
-        Toast.makeText(getApplicationContext(), "Your GPS is disabled! Is Needed for better service", Toast.LENGTH_LONG).show();
         Intent i = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
         i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(i);
     }
 
-    public void gpsManager() {
+    public void gpsLocationManager() {
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         //noinspection MissingPermission
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Variables.timeToUpdateLocationMilli, 0, this);

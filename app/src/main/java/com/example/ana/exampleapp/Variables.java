@@ -40,7 +40,7 @@ public final class Variables {
     // Regular expression to check email correction
     public static final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     // Time in milliseconds to get users locations...
-    public static final long timeToGetLocationMilli = (long) (1000 * 60 * 1);
+    public static final long timeToGetLocationMilli = (long) (1000 * 60 * 5);
     public static final long timeToUpdateLocationMilli =  (timeToGetLocationMilli-(long) 1000) / 2 ;
     public static final long startGpsLocationServiceMilli = 1000;
 
