@@ -34,6 +34,7 @@ public class GpsService extends Service implements LocationListener {
         } catch (Exception e) {
             Log.e(TAG,String.format("Error en ejecucion del servicio GpsService %s", e.getMessage()),e);
         }
+        locationManager.removeUpdates(this);
         stopSelf();
     }
 
