@@ -23,7 +23,6 @@ import android.graphics.Rect;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
-
 /**
  * Class that manages the diary text, whose recollection is the main aim of the app.
  *
