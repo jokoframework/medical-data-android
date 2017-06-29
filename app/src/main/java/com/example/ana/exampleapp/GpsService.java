@@ -14,7 +14,6 @@ import android.provider.Settings;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 import static android.content.ContentValues.TAG;
 
@@ -22,7 +21,7 @@ import static android.content.ContentValues.TAG;
 public class GpsService extends Service implements LocationListener {
 
 
-    private static Location nlocation;
+    private static Location nLocation;
     private LocationManager locationManager;
 
     @Override
@@ -39,12 +38,12 @@ public class GpsService extends Service implements LocationListener {
     }
 
 
-    public static Location getNlocation() {
-        return nlocation;
+    public static Location getnLocation() {
+        return nLocation;
     }
 
-    public static void setNlocation(Location nlocation) {
-        GpsService.nlocation = nlocation;
+    public static void setnLocation(Location nLocation) {
+        GpsService.nLocation = nLocation;
     }
 
 
@@ -56,7 +55,7 @@ public class GpsService extends Service implements LocationListener {
 
     @Override
     public void onLocationChanged(Location location) {
-        setNlocation(location);
+        setnLocation(location);
     }
 
     @Override
@@ -79,11 +78,11 @@ public class GpsService extends Service implements LocationListener {
     public void gpsLocationManager() {
         locationManager = (LocationManager) getApplicationContext().getSystemService(Context.LOCATION_SERVICE);
         //noinspection MissingPermission
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Variables.timeToUpdateLocationMilli, 0, this);
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, Variables.TIME_FOR_LOCATION_MILLI, 0, this);
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             return;
         }
-        setNlocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
+        setnLocation(locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER));
     }
 
 }

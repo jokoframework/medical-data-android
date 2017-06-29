@@ -40,8 +40,8 @@ public class LocationDataSend extends AsyncTask<Context, Void, Boolean> {
 
             Document document = new Document();
             document.append("user_id", userId);
-            document.append("latitud", GpsService.getNlocation().getLatitude());
-            document.append("longitud", GpsService.getNlocation().getLongitude());
+            document.append("latitud", GpsService.getnLocation().getLatitude());
+            document.append("longitud", GpsService.getnLocation().getLongitude());
             document.append("onDate", now.toString());
 
             coll.insertOne(document);

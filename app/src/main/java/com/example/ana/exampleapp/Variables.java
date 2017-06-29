@@ -9,16 +9,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 
-import com.mongodb.MongoCredential;
-import com.mongodb.ServerAddress;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static android.R.attr.key;
-import static android.R.attr.value;
-import static java.lang.System.setProperty;
-
 /**
  * Class with static final variables and methods used around the program.
  *
@@ -40,9 +30,8 @@ public final class Variables {
     // Regular expression to check email correction
     public static final String emailPattern = "[a-zA-Z0-9._-]+@[a-z]+\\.+[a-z]+";
     // Time in milliseconds to get users locations...
-    public static final long timeToGetLocationMilli = (long) (1000 * 60 * 1);
-    public static final long timeToUpdateLocationMilli =  (timeToGetLocationMilli-(long) 1000) / 2 ;
-    public static final long startGpsLocationServiceMilli = 1000;
+    public static final long TIME_FOR_LOCATION_MILLI = (long) (1000 * 60 * 1);
+    public static final long START_GPS_LOCATION_SERVICE_MILLI = 1000;
 
     /**
      * Final class: to prevent someone from accidentally instantiating the class, we give it an
